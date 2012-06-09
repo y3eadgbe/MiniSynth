@@ -30,26 +30,28 @@ VstXSynth: SDKとSynthesizerクラスを繋ぐクラス
 
 SignalProcessor: 音声処理の基底クラス
 
-Synthesizer: シンセサイザー本体クラス
+Synthesizer: シンセサイザー本体クラス（SignalProcessorを継承）
  ・MIDIを処理してVoiceControllerに処理を投げる
  ・VoiceControllerから出てきた音をmixする
  ・各種エフェクトに処理を投げる
  ・パラメータやパッチの管理
 
-VoiceController: VCO,VCF,VCAを管理するクラス
+VoiceController: VCO,VCF,VCAを管理するクラス（SignalProcessorを継承）
  ・VCO,VCFに処理を投げて音量を調整する
  ・エンベロープの管理
 
-Oscillator: オシレータクラス
+Oscillator: オシレータクラス（SignalProcessorを継承）
  ・Wavetableを参照して波形を生成
 
-Filter: フィルタクラス
+Filter: フィルタクラス（SignalProcessorを継承）
 
-Delay: ディレイクラス
+Delay: ディレイクラス（SignalProcessorを継承）
 
 Wavetable: 波形テーブルクラス
  ・singleton
  ・固定小数点による一次補間
+
+Random: 乱数クラス（未実装）
 
 ■その他
 Synth1の作者Daichiさんのサンプルコードを参考にしています。
