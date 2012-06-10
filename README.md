@@ -4,8 +4,8 @@
 #### 概要  
 シンプルなVSTiシンセサイザーです。  
 C++で書かれています。  
-別途 VST Audio Plug-Ins SDK 2.4 が必要です。 
-<http://www.steinberg.net/en/company/developer.html>
+別途 VST Audio Plug-Ins SDK 2.4 が必要です。  
+<http://www.steinberg.net/en/company/developer.html>  
 
 #### 機能  
 * 32音ポリフォニック
