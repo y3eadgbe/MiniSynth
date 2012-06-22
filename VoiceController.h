@@ -44,6 +44,8 @@ public:
 	void setPitch(double value);
 	void setPortamentTime(double value);
 	void setPortamentAuto(bool value);
+	void setOscillatorDetune(int n, double value);
+	void setOscillatorPitch(int n, double value);
 
 	void updateParameters(int size);
 protected:
@@ -67,6 +69,9 @@ protected:
 	double decayTime;
 	double sustain;
 	double releaseTime;
+
+	double oscillatorDetune[2];
+	double oscillatorPitch[2];
 
 	double filterAttackTime;
 	double filterDecayTime;

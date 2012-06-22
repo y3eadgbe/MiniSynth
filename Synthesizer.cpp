@@ -29,11 +29,19 @@ Synthesizer::Synthesizer(void)
 	this->parameterName[MASTER_VOLUME] = "MasterVolume";
 	this->parameterName[OSCILLATOR1_WAVEFORM] = "Osc1WaveForm";
 	this->parameterName[OSCILLATOR2_WAVEFORM] = "Osc2WaveForm";
+	this->parameterName[OSCILLATOR1_DETUNE] = "Osc1Detune";
+	this->parameterName[OSCILLATOR2_PITCH] = "Osc2Pitch";
+	this->parameterName[OSCILLATOR2_DETUNE] = "Osc2Detune";
 	this->parameterName[AMP_ATTACK_TIME] = "AmpAttackTime";
 	this->parameterName[AMP_DECAY_TIME] = "AmpDecayTime";
 	this->parameterName[AMP_SUSTAIN] = "AmpSustain";
 	this->parameterName[AMP_RELEASE_TIME] = "AmpReleaseTime";
 	this->parameterName[OSCILLATOR_MIX] = "OscMix";
+	this->parameterName[FILTER_ATTACK_TIME] = "FltAttackTime";
+	this->parameterName[FILTER_DECAY_TIME] = "FltDecayTime";
+	this->parameterName[FILTER_SUSTAIN] = "FltSustain";
+	this->parameterName[FILTER_RELEASE_TIME] = "FltRelease";
+	this->parameterName[FILTER_AMOUNT] = "FltAmt";
 	this->parameterName[CUT_OFF_FREQUENCY] = "CutOffFreq";
 	this->parameterName[RESONANCE] = "Resonance";
 	this->parameterName[PORTAMENT_TIME] = "PortaTime";
@@ -60,6 +68,9 @@ Synthesizer::Synthesizer(void)
 		this->programs[i].parameter[MASTER_VOLUME] = 0.5;
 		this->programs[i].parameter[AMP_SUSTAIN] = 1.0;
 		this->programs[i].parameter[CUT_OFF_FREQUENCY] = 0.5;
+		this->programs[i].parameter[OSCILLATOR1_DETUNE] = 0.5;
+		this->programs[i].parameter[OSCILLATOR2_PITCH] = 0.5;
+		this->programs[i].parameter[OSCILLATOR2_DETUNE] = 0.5;
 	}
 	this->setProgram(0);
 }
@@ -152,6 +163,24 @@ void Synthesizer::setParameter(int index, double value)
 			this->voiceController[i]->setWaveForm(wf, 1);
 		}
 		break;
+	case OSCILLATOR1_DETUNE:
+		for (int i = 0; i < SynthConsts::VOICE_CONTROLLER_SIZE; i++)
+		{
+			this->voiceController[i]->setOscillatorDetune(0, this->valueToOscillatorDetune(value));
+		}
+		break;		
+	case OSCILLATOR2_PITCH:
+		for (int i = 0; i < SynthConsts::VOICE_CONTROLLER_SIZE; i++)
+		{
+			this->voiceController[i]->setOscillatorPitch(1, this->valueToOscillatorPitch(value));
+		}
+		break;
+	case OSCILLATOR2_DETUNE:
+		for (int i = 0; i < SynthConsts::VOICE_CONTROLLER_SIZE; i++)
+		{
+			this->voiceController[i]->setOscillatorDetune(1, this->valueToOscillatorDetune(value));
+		}
+		break;		
 	case AMP_ATTACK_TIME:
 		for (int i = 0; i < SynthConsts::VOICE_CONTROLLER_SIZE; i++)
 		{
@@ -261,6 +290,15 @@ void Synthesizer::getParameterDisplay(int index, char* buffer)
 	case OSCILLATOR2_WAVEFORM:
 		strcpy_s(buffer, 255, this->waveFormName[this->valueToWaveForm(this->programs[this->curProgram].parameter[OSCILLATOR2_WAVEFORM])].c_str());
 		break;
+	case OSCILLATOR1_DETUNE:
+	case OSCILLATOR2_DETUNE:
+		ss << this->valueToOscillatorDetune(this->programs[this->curProgram].parameter[index]);
+		strcpy_s(buffer, 255, ss.str().c_str());
+		break;
+	case OSCILLATOR2_PITCH:
+		ss << this->valueToOscillatorPitch(this->programs[this->curProgram].parameter[index]);
+		strcpy_s(buffer, 255, ss.str().c_str());
+		break;
 	case VOICE_MODE:
 		strcpy_s(buffer, 255, this->voiceModeName[this->valueToVoiceMode(this->programs[this->curProgram].parameter[VOICE_MODE])].c_str());
 		break;
@@ -279,6 +317,11 @@ void Synthesizer::getParameterDisplay(int index, char* buffer)
 	case AMP_DECAY_TIME:
 	case AMP_RELEASE_TIME:
 		ss << this->valueToTime(this->programs[this->curProgram].parameter[index]);
+		strcpy_s(buffer, 255, ss.str().c_str());
+		break;
+	case PORTAMENT_AUTO:
+	case DELAY_SWITCH:
+		ss << (this->valueToBool(this->programs[this->curProgram].parameter[index]) ? "On" : "Off");
 		strcpy_s(buffer, 255, ss.str().c_str());
 		break;
 	default:
@@ -497,4 +540,14 @@ double Synthesizer::valueToResonance(double value)
 bool Synthesizer::valueToBool(double value)
 {
 	return value >= 0.5;
+}
+
+double Synthesizer::valueToOscillatorDetune(double value)
+{
+	return (value - 0.5) * 100.0;
+}
+
+double Synthesizer::valueToOscillatorPitch(double value)
+{
+	return floor((value - 0.5) * 100);
 }

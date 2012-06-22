@@ -144,12 +144,17 @@ void WaveTable::generateSawWave(void)
 void WaveTable::generatePulseWave(void)
 {
 	for (int i = 0; i < this->SAMPLE_SIZE; i++)
-	{	
-		if (i < this->SAMPLE_SIZE / 2)
-		{
-			this->pulseWave[0][i] = 1.0;
-		} else {
-			this->pulseWave[0][i] = -1.0;
+	{
+		double phase = M_PI * 2.0 * i / (double) this->SAMPLE_SIZE;
+		this->pulseWave[0][i] = 4.0 * sin(phase) / M_PI;
+	}
+	for (int i = 1; i < (this->HARMONICS_MAX + 1) / 2; i++)
+	{
+		double n = 2 * i + 1;
+		for (int j = 0; j < this->SAMPLE_SIZE; j++)
+		{	
+			double phase = M_PI * 2.0 * j / (double) this->SAMPLE_SIZE;
+			this->pulseWave[i][j] = this->pulseWave[i - 1][j] + 4.0 * sin(n * phase) / (M_PI * n);
 		}
 	}
 }

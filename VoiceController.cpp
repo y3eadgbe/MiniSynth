@@ -29,7 +29,7 @@ VoiceController::VoiceController(void)
 	this->filterDecayTime = 0.1;
 	this->filterSustain = 0;
 	this->filterReleaseTime = 0.5;
-	this->filterAmount = 0;
+	//this->filterAmount = 8000;
 
 	this->pitch = 0;
 	this->portamentTime = 0;
@@ -38,6 +38,9 @@ VoiceController::VoiceController(void)
 	this->baseVelocity = 0;
 	this->targetVelocity = 0;
 	this->isPortamentMode = true;
+
+	this->oscillatorDetune[0] = 0;
+	this->oscillatorDetune[1] = 0;
 
 	this->envelopeFrame = 0;
 	this->filterEnvelopeFrame = 0;
@@ -142,7 +145,7 @@ void VoiceController::processMonoralToMonoral(int size, double** signalIn, doubl
 		}
 
 		processFrame = std::min(processFrame, processSize);
-
+		
 		// Filter Envelope
 		switch (this->filterState)
 		{
@@ -199,7 +202,7 @@ void VoiceController::processMonoralToMonoral(int size, double** signalIn, doubl
 			this->filterEnvelopeFrame = 0;
 			break;
 		}
-
+		
 		this->filter->setCutOffFrequency(this->cutOffFrequency + this->filterRatio * this->filterAmount);
 		
 		for ( ; i < processFrame; i++)
@@ -215,8 +218,6 @@ void VoiceController::processMonoralToMonoral(int size, double** signalIn, doubl
 		}
 		this->updateParameters(processFrame);
 	}
-
-	//this->filter->processMonoralToMonoral(size, signalOut, signalOut);
 
 	if (this->envelopeState == IDLE)
 	{
@@ -250,15 +251,16 @@ void VoiceController::setFrequency(double value)
 	}
 	for (int i = 0; i < OSCILLATOR_SIZE; i++)
 	{
+		double f = pow(2.0, (12.0 * log(this->frequency / 440) / log(2.0) + this->oscillatorDetune[i] / 100 + this->oscillatorPitch[i]) / 12) * 440.0;
 		if (this->isPortamentMode)
 		{
 			if (this->portamentAuto == true && this->envelopeState == IDLE) {
-				this->oscillator[i]->setFrequency(this->frequency);
+				this->oscillator[i]->setFrequency(f);
 			} else {
-				this->oscillator[i]->setPortamentFrequency(this->frequency, this->portamentTime);
+				this->oscillator[i]->setPortamentFrequency(f, this->portamentTime);
 			}
 		} else {
-			this->oscillator[i]->setFrequency(this->frequency);
+			this->oscillator[i]->setFrequency(f);
 		}
 	}
 }
@@ -401,8 +403,8 @@ void VoiceController::setReleaseTime(double value)
 
 void VoiceController::setGain(double value)
 {
-	this->gain[0] = value;
-	this->gain[1] = 1 - value;
+	this->gain[0] = 1 - value;
+	this->gain[1] = value;
 	if (gain[0] < EPS)
 	{
 		gain[0] = 0;
@@ -416,7 +418,7 @@ void VoiceController::setGain(double value)
 void VoiceController::setCutOffFrequency(double value)
 {
 	this->cutOffFrequency = value;
-	//this->filter->setCutOffFrequency(value);
+	this->filter->setCutOffFrequency(value);
 }
 
 void VoiceController::setResonance(double value)
@@ -441,4 +443,16 @@ void VoiceController::setPortamentAuto(bool value)
 void VoiceController::updateParameters(int size)
 {
 	this->filter->updateParameters(size);
+}
+
+void VoiceController::setOscillatorDetune(int n, double value)
+{
+	this->oscillatorDetune[n] = value;
+	this->setFrequency(this->frequency);
+}
+
+void VoiceController::setOscillatorPitch(int n, double value)
+{
+	this->oscillatorPitch[n] = value;
+	this->setFrequency(this->frequency);
 }

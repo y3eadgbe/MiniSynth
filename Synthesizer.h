@@ -71,4 +71,6 @@ private:
 	double valueToCutOffFrequency(double value);
 	double valueToResonance(double value);
 	bool valueToBool(double value);
+	double valueToOscillatorDetune(double value);
+	double valueToOscillatorPitch(double value);
 };
